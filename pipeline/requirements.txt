@@ -1,0 +1,17 @@
+# Core (lightweight — depth/segmentation models downloaded on first run)
+numpy>=1.26,<2
+opencv-python-headless>=4.8
+Pillow>=10.0
+scipy>=1.11
+
+# Depth Anything V2 via Hugging Face
+torch>=2.1
+torchvision>=0.16
+transformers>=4.44
+
+# Segmentation
+mediapipe>=0.10.14
+rembg>=2.0.50
+transformers>=4.44
+
+# MindAR .mind compilation uses Node.js (@napi-rs/canvas shim); see compile_mind.mjs
