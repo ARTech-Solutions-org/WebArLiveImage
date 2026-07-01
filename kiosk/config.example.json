@@ -1,5 +1,5 @@
 {
-  "app_url": "https://your-app.vercel.app",
+  "app_url": "https://web-ar-live-image-iota.vercel.app/",
   "bundle_root": "../assets/targets",
   "output_root": "./output",
   "captures_root": "./captures",
@@ -14,11 +14,11 @@
     ]
   },
   "cdn": {
-    "endpoint_url": "https://ACCOUNT_ID.r2.cloudflarestorage.com",
-    "bucket": "webar-targets",
-    "access_key_id": "YOUR_R2_ACCESS_KEY",
-    "secret_access_key": "YOUR_R2_SECRET_KEY",
-    "public_base_url": "https://pub-xxxx.r2.dev/webar-targets",
+    "endpoint_url": "https://6689d1626b5ab6e9f9e69e886af37e97.r2.cloudflarestorage.com",
+    "bucket": "guest-bundles",
+    "access_key_id": "542e8095eeb5daa9e6adbaa72802925c",
+    "secret_access_key": "05d5ec663b1fd6d61e05d36fe70c24a57b31ba074a1ec26af29b7514a86aa4f0",
+    "public_base_url": "hhttps://pub-6689d1626b5ab6e9f9e69e886af37e97.r2.dev",
     "prefix": ""
   }
 }
