@@ -1,0 +1,24 @@
+{
+  "app_url": "https://web-ar-live-image-iota.vercel.app",
+  "bundle_root": "../assets/targets",
+  "output_root": "./output",
+  "captures_root": "./captures",
+  "notes": "Copy to config.json (gitignored). app_url = Vercel URL. cdn = R2 upload for guest bundles.",
+  "api": {
+    "host": "127.0.0.1",
+    "port": 8787,
+    "allowed_origins": [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "https://web-ar-live-image-iota.vercel.app"
+    ]
+  },
+  "cdn": {
+    "endpoint_url": "https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com",
+    "bucket": "guest-bundles",
+    "access_key_id": "YOUR_R2_ACCESS_KEY",
+    "secret_access_key": "YOUR_R2_SECRET_KEY",
+    "public_base_url": "https://pub-YOUR_ACCOUNT_ID.r2.dev",
+    "prefix": ""
+  }
+}
