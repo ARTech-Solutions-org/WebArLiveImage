@@ -19,12 +19,12 @@
     }
   },
   "tracking": {
-    "precheckFeatureCount": null,
-    "precheckGridOccupancy": null,
-    "precheckDistributionScore": null,
-    "compiledFeatureCount": 1906,
-    "compiledGridOccupancy": 16,
-    "compiledDistributionScore": 1.0,
+    "precheckFeatureCount": 1081,
+    "precheckGridOccupancy": 16,
+    "precheckDistributionScore": 1.0,
+    "compiledFeatureCount": null,
+    "compiledGridOccupancy": null,
+    "compiledDistributionScore": null,
     "trackable": true
   },
   "animation": {
@@ -32,9 +32,8 @@
     "rig": null
   },
   "pipeline": {
-    "createdAt": "2026-07-01T12:00:00.000000+00:00",
+    "createdAt": "2026-07-01T10:43:20.005494+00:00",
     "depthModel": "small",
-    "segmentationMode": "auto",
-    "note": "Replaced synthetic test image with feature-rich trackable poster"
+    "segmentationMode": "rembg"
   }
 }

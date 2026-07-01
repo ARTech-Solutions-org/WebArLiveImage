@@ -1,14 +1,10 @@
 import { MindARThree } from 'mind-ar/src/image-target/three.js'
-import {
-  DoubleSide,
-  Mesh,
-  MeshBasicMaterial,
-  PlaneGeometry,
-  sRGBEncoding,
-  Texture,
-  TextureLoader,
-} from 'three'
 import type { BundleMeta } from '../loader/types'
+import {
+  createDepthLayerMeshes,
+  disposeDepthLayerMeshes,
+  loadDepthLayerAssets,
+} from './depth-layers'
 
 export type ARTrackingStatus = 'initializing' | 'scanning' | 'locked' | 'lost' | 'error'
 
@@ -16,6 +12,9 @@ export interface ARSessionOptions {
   container: HTMLElement
   mindUrl: string
   sourceUrl: string
+  depthUrl: string
+  maskBackgroundUrl: string
+  maskForegroundUrl: string
   meta: BundleMeta
   onStatus?: (status: ARTrackingStatus, message?: string) => void
   uiScanning?: 'yes' | 'no'
@@ -24,13 +23,6 @@ export interface ARSessionOptions {
 export interface ARSession {
   start: () => Promise<void>
   stop: () => void
-}
-
-function loadTexture(url: string): Promise<Texture> {
-  return new Promise((resolve, reject) => {
-    const loader = new TextureLoader()
-    loader.load(url, resolve, undefined, reject)
-  })
 }
 
 /** MindAR stacks video under WebGL; canvas must clear transparent or the feed looks black. */
@@ -61,6 +53,9 @@ export async function createARSession({
   container,
   mindUrl,
   sourceUrl,
+  depthUrl,
+  maskBackgroundUrl,
+  maskForegroundUrl,
   meta,
   onStatus,
   uiScanning = 'yes',
@@ -79,20 +74,22 @@ export async function createARSession({
   const anchor = mindarThree.addAnchor(0)
 
   anchor.onTargetFound = () => {
-    onStatus?.('locked', 'Target locked — image anchored.')
+    onStatus?.('locked', 'Target locked — move your phone to feel the depth.')
   }
   anchor.onTargetLost = () => {
     onStatus?.('lost', 'Target lost — scan the printed image again.')
   }
 
-  const texture = await loadTexture(sourceUrl)
-  texture.encoding = sRGBEncoding
+  const assets = await loadDepthLayerAssets({
+    source: sourceUrl,
+    depth: depthUrl,
+    maskBackground: maskBackgroundUrl,
+    maskForeground: maskForegroundUrl,
+  })
 
-  const aspect = meta.height / meta.width
-  const geometry = new PlaneGeometry(1, aspect)
-  const material = new MeshBasicMaterial({ map: texture, side: DoubleSide })
-  const plane = new Mesh(geometry, material)
-  anchor.group.add(plane)
+  const layers = createDepthLayerMeshes(meta, assets)
+  anchor.group.add(layers.background)
+  anchor.group.add(layers.foreground)
 
   const onResize = () => mindarThree.resize()
   window.addEventListener('resize', onResize)
@@ -118,9 +115,9 @@ export async function createARSession({
       window.removeEventListener('resize', onResize)
       renderer.setAnimationLoop(null)
       mindarThree.stop()
-      texture.dispose()
-      geometry.dispose()
-      material.dispose()
+      anchor.group.remove(layers.background)
+      anchor.group.remove(layers.foreground)
+      disposeDepthLayerMeshes(layers, assets)
     },
   }
 }

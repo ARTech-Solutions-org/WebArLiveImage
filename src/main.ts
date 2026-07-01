@@ -79,15 +79,25 @@ async function boot(): Promise<void> {
 
     const mindUrl = resolveAssetUrl(bundle.baseUrl, bundle.meta.mind_file)
     const sourceUrl = resolveAssetUrl(bundle.baseUrl, bundle.meta.source)
+    const depthUrl = resolveAssetUrl(bundle.baseUrl, bundle.meta.depth)
+    const maskBackgroundUrl = resolveAssetUrl(bundle.baseUrl, bundle.meta.layers.background.mask)
+    const maskForegroundUrl = resolveAssetUrl(bundle.baseUrl, bundle.meta.layers.foreground.mask)
 
-    // Pre-fetch tracking file so load errors surface early.
-    await bundle.loadMind()
+    await Promise.all([
+      bundle.loadMind(),
+      bundle.loadDepth(),
+      bundle.loadMaskBackground(),
+      bundle.loadMaskForeground(),
+    ])
     if (token !== bootToken) return
 
     activeSession = await createARSession({
       container: arStage,
       mindUrl,
       sourceUrl,
+      depthUrl,
+      maskBackgroundUrl,
+      maskForegroundUrl,
       meta: bundle.meta,
       onStatus: (status, message) => {
         if (token !== bootToken) return
