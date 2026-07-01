@@ -27,7 +27,7 @@ function targetBundlesPlugin(): Plugin {
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
         const url = req.url?.split('?')[0] ?? ''
-        if (url === '/kiosk' || url === '/kiosk/') {
+        if (url === '/kiosk' || url === '/kiosk/' || url.startsWith('/kiosk/')) {
           const query = req.url?.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''
           req.url = `/kiosk.html${query}`
         }
@@ -73,6 +73,12 @@ export default defineConfig({
   server: {
     host: true,
     https: false,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     target: 'es2022',

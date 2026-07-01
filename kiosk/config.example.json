@@ -2,7 +2,17 @@
   "app_url": "https://your-app.vercel.app",
   "bundle_root": "../assets/targets",
   "output_root": "./output",
-  "notes": "Booth display: {app_url}/kiosk?target=ID — Guest AR: {app_url}/?target=ID",
+  "captures_root": "./captures",
+  "notes": "Booth display: {app_url}/kiosk?target=ID — Guest AR: {app_url}/?target=ID — Capture: {app_url}/kiosk/capture",
+  "api": {
+    "host": "127.0.0.1",
+    "port": 8787,
+    "allowed_origins": [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "https://your-app.vercel.app"
+    ]
+  },
   "cdn": {
     "endpoint_url": "https://ACCOUNT_ID.r2.cloudflarestorage.com",
     "bucket": "webar-targets",

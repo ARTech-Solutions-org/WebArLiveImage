@@ -3,6 +3,7 @@ export type CameraStatus = 'idle' | 'requesting' | 'active' | 'error'
 export interface CameraFeedOptions {
   video: HTMLVideoElement
   onStatus?: (status: CameraStatus, message?: string) => void
+  constraints?: MediaStreamConstraints
 }
 
 const PREFERRED_CONSTRAINTS: MediaStreamConstraints = {
@@ -17,6 +18,7 @@ const PREFERRED_CONSTRAINTS: MediaStreamConstraints = {
 export async function startCameraFeed({
   video,
   onStatus,
+  constraints = PREFERRED_CONSTRAINTS,
 }: CameraFeedOptions): Promise<MediaStream> {
   if (!navigator.mediaDevices?.getUserMedia) {
     const message = 'Camera API is not available in this browser.'
@@ -28,7 +30,7 @@ export async function startCameraFeed({
 
   let stream: MediaStream
   try {
-    stream = await navigator.mediaDevices.getUserMedia(PREFERRED_CONSTRAINTS)
+    stream = await navigator.mediaDevices.getUserMedia(constraints)
   } catch (primaryError) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })

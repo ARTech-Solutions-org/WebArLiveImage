@@ -1,10 +1,16 @@
 import QRCode from 'qrcode'
 import './style.css'
-import { getArPageUrl, getBundleSourceUrl, getKioskPageUrl, getKioskTargetId } from './config'
+import { getArPageUrl, getBundleSourceUrl, getKioskPageUrl, getKioskTargetId, isCaptureRoute } from './config'
+import { mountCaptureView } from './capture'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
+let captureCleanup: (() => void) | null = null
+
 function renderShell(content: string): void {
+  captureCleanup?.()
+  captureCleanup = null
+
   app.innerHTML = `
     <div class="kiosk">
       <header class="kiosk-header">
@@ -18,22 +24,21 @@ function renderShell(content: string): void {
 
 function renderLanding(): void {
   renderShell(`
+    <section class="panel hero-panel">
+      <h2>Welcome</h2>
+      <p class="muted">Step up to the booth and take your photo. We will turn it into a live AR experience.</p>
+      <div class="row">
+        <a class="button capture-cta" href="/kiosk/capture">Take photo</a>
+        <a class="button secondary" href="/kiosk?target=target_001">Demo target_001</a>
+      </div>
+    </section>
     <section class="panel">
-      <h2>Booth display</h2>
-      <p class="muted">Enter a target ID after ingest, or open a demo target.</p>
+      <h2>Already processed?</h2>
+      <p class="muted">Enter a target ID to show the booth preview screen.</p>
       <form class="row" id="target-form">
         <input id="target-input" type="text" placeholder="guest_20260701_123456" />
         <button type="submit">Show preview</button>
-        <a class="button secondary" href="/kiosk?target=target_001">Demo target_001</a>
       </form>
-    </section>
-    <section class="panel">
-      <h2>Two flows, one deployment</h2>
-      <ul class="flow-list">
-        <li><strong>Fixed targets</strong> — pre-ingested bundles like <code>target_001</code></li>
-        <li><strong>Kiosk guests</strong> — <code>run_job.py</code> creates a new bundle per photo</li>
-      </ul>
-      <p class="muted">AR experience always opens at <code>/?target=ID</code>. This page is the booth screen at <code>/kiosk?target=ID</code>.</p>
     </section>
   `)
 
@@ -41,7 +46,15 @@ function renderLanding(): void {
     event.preventDefault()
     const value = document.querySelector<HTMLInputElement>('#target-input')!.value.trim()
     if (!value) return
-    window.location.search = `?target=${encodeURIComponent(value)}`
+    window.location.href = `/kiosk?target=${encodeURIComponent(value)}`
+  })
+}
+
+function renderCapture(): void {
+  renderShell('<div id="capture-root"></div>')
+  const root = document.querySelector<HTMLDivElement>('#capture-root')!
+  captureCleanup = mountCaptureView(root, (targetId) => {
+    window.location.href = `/kiosk?target=${encodeURIComponent(targetId)}`
   })
 }
 
@@ -55,6 +68,7 @@ async function renderTargetPreview(targetId: string): Promise<void> {
       <p class="muted">Target: <code>${targetId}</code></p>
       <div class="row" style="margin-bottom: 1rem;">
         <a class="button" href="${arUrl}" target="_blank" rel="noopener">Open AR experience</a>
+        <a class="button secondary" href="/kiosk/capture">Take another photo</a>
         <a class="button secondary" href="/kiosk">Back</a>
       </div>
       <div class="preview-grid">
@@ -103,6 +117,11 @@ async function renderTargetPreview(targetId: string): Promise<void> {
 }
 
 async function boot(): Promise<void> {
+  if (isCaptureRoute()) {
+    renderCapture()
+    return
+  }
+
   const targetId = getKioskTargetId()
   if (!targetId) {
     renderLanding()
