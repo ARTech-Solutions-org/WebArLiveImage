@@ -1,0 +1,9 @@
+{
+  "name": "webar-pipeline",
+  "private": true,
+  "type": "module",
+  "description": "Offline ingest tools (not deployed to Vercel)",
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.2"
+  }
+}
