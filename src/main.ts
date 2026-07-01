@@ -65,16 +65,11 @@ function setStatus(status: ARTrackingStatus | 'loading-bundle' | 'idle', message
 
 async function boot(): Promise<void> {
   const token = ++bootToken
-  const targetId = getTargetIdFromUrl()
+  const targetId = getTargetIdFromUrl()!
 
   if (activeSession) {
     activeSession.stop()
     activeSession = null
-  }
-
-  if (!targetId) {
-    setStatus('error', 'No target specified. Open /?target=target_001')
-    return
   }
 
   try {
