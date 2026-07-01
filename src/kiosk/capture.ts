@@ -1,5 +1,6 @@
 import { startCameraFeed, stopCameraFeed } from '../ar-core/camera'
 import { checkKioskApiHealth, createPhotoJob, waitForJob } from './api'
+import { getKioskApiBaseUrl } from './config'
 
 const BOOTH_CAMERA: MediaStreamConstraints = {
   audio: false,
@@ -182,11 +183,18 @@ export function mountCaptureView(root: HTMLElement, onComplete: (targetId: strin
   void (async () => {
     const apiReady = await checkKioskApiHealth()
     if (!apiReady) {
+      const apiBase = getKioskApiBaseUrl() || window.location.origin
       setStatus(
-        'Booth service is offline. On this PC run: python kiosk/server.py',
+        `Booth service is offline (${apiBase}/api/health). In a terminal on this PC run: npm run kiosk:server`,
         true,
       )
-      actions.innerHTML = `<a class="button secondary" href="/kiosk">Back</a>`
+      actions.innerHTML = `
+        <button type="button" class="secondary" id="btn-retry">Retry connection</button>
+        <a class="button secondary" href="/kiosk">Back</a>
+      `
+      actions.querySelector<HTMLButtonElement>('#btn-retry')!.addEventListener('click', () => {
+        window.location.reload()
+      })
       return
     }
 

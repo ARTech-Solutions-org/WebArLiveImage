@@ -1,9 +1,12 @@
 import { getArPageUrl, getTargetIdFromUrl, resolveAssetUrl, resolveBundleBaseUrl } from '../loader/config'
 
-const KIOSK_API_BASE = import.meta.env.VITE_KIOSK_API_URL?.replace(/\/$/, '') ?? ''
+const KIOSK_API_BASE = import.meta.env.VITE_KIOSK_API_URL?.replace(/\/$/, '')
 
+/** Booth ingest API — local PC only. Dev uses Vite /api proxy; production defaults to loopback. */
 export function getKioskApiBaseUrl(): string {
-  return KIOSK_API_BASE
+  if (KIOSK_API_BASE) return KIOSK_API_BASE
+  if (import.meta.env.DEV) return ''
+  return 'http://127.0.0.1:8787'
 }
 
 export function isCaptureRoute(pathname = window.location.pathname): boolean {

@@ -145,13 +145,13 @@ def create_app(config_path: Path, config: dict, store: JobStore) -> Flask:
     app = Flask(__name__)
 
     api_cfg = config.get("api", {})
-    origins = api_cfg.get("allowed_origins") or [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        str(config.get("app_url", "")).rstrip("/"),
-    ]
-    origins = [origin for origin in origins if origin]
-    CORS(app, resources={r"/api/*": {"origins": origins}})
+    origins = api_cfg.get("allowed_origins")
+    if origins:
+        allowed = [origin for origin in origins if origin]
+        CORS(app, resources={r"/api/*": {"origins": allowed}})
+    else:
+        # Local booth service on loopback — allow deployed kiosk origins from this PC's browser.
+        CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     captures_root = resolve_path(config_path, config.get("captures_root", "./captures"), KIOSK_DIR / "captures")
     captures_root.mkdir(parents=True, exist_ok=True)
