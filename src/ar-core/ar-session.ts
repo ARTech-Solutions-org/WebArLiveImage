@@ -32,6 +32,30 @@ function loadTexture(url: string): Promise<Texture> {
   })
 }
 
+/** MindAR stacks video under WebGL; canvas must clear transparent or the feed looks black. */
+function configureMindARDisplay(mindarThree: MindARThree): void {
+  const { renderer, cssRenderer, video } = mindarThree
+
+  renderer.setClearColor(0x000000, 0)
+  renderer.domElement.style.pointerEvents = 'none'
+  renderer.domElement.style.zIndex = '2'
+
+  cssRenderer.domElement.style.display = 'none'
+  cssRenderer.domElement.style.pointerEvents = 'none'
+
+  video.style.zIndex = '1'
+  video.style.objectFit = 'cover'
+  video.setAttribute('playsinline', '')
+  video.setAttribute('webkit-playsinline', '')
+  video.muted = true
+
+  void video.play().catch(() => {
+    // iOS may require a user gesture; MindAR start() is usually enough.
+  })
+
+  mindarThree.resize()
+}
+
 export async function createARSession({
   container,
   mindUrl,
@@ -67,12 +91,17 @@ export async function createARSession({
   const plane = new Mesh(geometry, material)
   anchor.group.add(plane)
 
+  const onResize = () => mindarThree.resize()
+  window.addEventListener('resize', onResize)
+
   return {
     async start() {
       onStatus?.('initializing', 'Starting AR camera…')
       try {
         await mindarThree.start()
-      } catch {
+        configureMindARDisplay(mindarThree)
+      } catch (error) {
+        console.error('[WebAR] MindAR start failed:', error)
         onStatus?.('error', 'Failed to start AR. Check camera permission.')
         throw new Error('MindAR failed to start')
       }
@@ -83,6 +112,7 @@ export async function createARSession({
       })
     },
     stop() {
+      window.removeEventListener('resize', onResize)
       renderer.setAnimationLoop(null)
       mindarThree.stop()
       texture.dispose()

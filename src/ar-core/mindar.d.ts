@@ -27,13 +27,16 @@ declare module 'mind-ar/src/image-target/three.js' {
     container: HTMLElement
     scene: Scene
     renderer: WebGLRenderer
+    cssRenderer: { domElement: HTMLElement }
     camera: PerspectiveCamera
     anchors: MindARAnchor[]
+    video: HTMLVideoElement
 
     constructor(options: MindARThreeOptions)
     start(): Promise<void>
     stop(): void
     switchCamera(): void
     addAnchor(targetIndex: number): MindARAnchor
+    resize(): void
   }
 }
