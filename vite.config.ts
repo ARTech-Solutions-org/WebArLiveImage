@@ -25,6 +25,15 @@ function targetBundlesPlugin(): Plugin {
   return {
     name: 'target-bundles',
     configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        const url = req.url?.split('?')[0] ?? ''
+        if (url === '/kiosk' || url === '/kiosk/') {
+          const query = req.url?.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''
+          req.url = `/kiosk.html${query}`
+        }
+        next()
+      })
+
       server.middlewares.use((req, res, next) => {
         const url = req.url?.split('?')[0] ?? ''
         if (!url.startsWith('/targets/')) {
@@ -67,6 +76,12 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
+    rollupOptions: {
+      input: {
+        main: path.resolve(repoRoot, 'index.html'),
+        kiosk: path.resolve(repoRoot, 'kiosk.html'),
+      },
+    },
   },
   optimizeDeps: {
     exclude: ['mind-ar'],

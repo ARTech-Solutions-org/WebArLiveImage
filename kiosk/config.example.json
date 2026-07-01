@@ -1,0 +1,14 @@
+{
+  "app_url": "https://your-app.vercel.app",
+  "bundle_root": "../assets/targets",
+  "output_root": "./output",
+  "notes": "Booth display: {app_url}/kiosk?target=ID — Guest AR: {app_url}/?target=ID",
+  "cdn": {
+    "endpoint_url": "https://ACCOUNT_ID.r2.cloudflarestorage.com",
+    "bucket": "webar-targets",
+    "access_key_id": "YOUR_R2_ACCESS_KEY",
+    "secret_access_key": "YOUR_R2_SECRET_KEY",
+    "public_base_url": "https://pub-xxxx.r2.dev/webar-targets",
+    "prefix": ""
+  }
+}

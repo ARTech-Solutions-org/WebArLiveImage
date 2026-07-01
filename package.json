@@ -11,12 +11,14 @@
     "compile-mind": "npm install --prefix pipeline && node pipeline/compile_mind.mjs"
   },
   "devDependencies": {
+    "@types/qrcode": "^1.5.6",
     "@types/three": "0.160.0",
     "typescript": "~6.0.2",
     "vite": "^8.1.1"
   },
   "dependencies": {
     "mind-ar": "^1.2.5",
+    "qrcode": "^1.5.4",
     "three": "0.160.1"
   }
 }

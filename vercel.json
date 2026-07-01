@@ -1,3 +1,8 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/kiosk", "destination": "/kiosk.html" },
+    { "source": "/kiosk/", "destination": "/kiosk.html" },
+    { "source": "/ar", "destination": "/index.html" },
+    { "source": "/((?!assets/|targets/|favicon\\.svg|icons\\.svg|kiosk\\.html).*)", "destination": "/index.html" }
+  ]
 }

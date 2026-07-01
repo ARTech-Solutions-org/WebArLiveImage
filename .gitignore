@@ -16,6 +16,10 @@ dist-ssr
 pipeline/test_input.*
 pipeline/test_output.mind
 pipeline/models/*.tflite
+kiosk/output/
+
+# Kiosk secrets (keep credentials out of git)
+kiosk/config.json
 
 # Editor directories and files
 .vscode/*

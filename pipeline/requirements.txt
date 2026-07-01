@@ -15,3 +15,7 @@ rembg>=2.0.50
 transformers>=4.44
 
 # MindAR .mind compilation uses Node.js (@napi-rs/canvas shim); see compile_mind.mjs
+
+# Kiosk / CDN
+boto3>=1.35
+qrcode>=8.0
