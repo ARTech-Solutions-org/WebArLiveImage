@@ -1,5 +1,6 @@
 import { MindARThree } from 'mind-ar/src/image-target/three.js'
 import {
+  DoubleSide,
   Mesh,
   MeshBasicMaterial,
   PlaneGeometry,
@@ -70,6 +71,8 @@ export async function createARSession({
     uiLoading: 'no',
     uiScanning,
     uiError: 'yes',
+    warmupTolerance: 0,
+    missTolerance: 10,
   })
 
   const { renderer, scene, camera } = mindarThree
@@ -87,7 +90,7 @@ export async function createARSession({
 
   const aspect = meta.height / meta.width
   const geometry = new PlaneGeometry(1, aspect)
-  const material = new MeshBasicMaterial({ map: texture })
+  const material = new MeshBasicMaterial({ map: texture, side: DoubleSide })
   const plane = new Mesh(geometry, material)
   anchor.group.add(plane)
 
@@ -106,7 +109,7 @@ export async function createARSession({
         throw new Error('MindAR failed to start')
       }
 
-      onStatus?.('scanning', 'Point your camera at the printed image.')
+      onStatus?.('scanning', 'Fill the frame with the print — hold steady 1–2 seconds.')
       renderer.setAnimationLoop(() => {
         renderer.render(scene, camera)
       })

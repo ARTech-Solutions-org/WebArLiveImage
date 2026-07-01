@@ -2,8 +2,8 @@
   "target_id": "target_001",
   "version": 1,
   "source": "source.jpg",
-  "width": 640,
-  "height": 480,
+  "width": 800,
+  "height": 1067,
   "depth": "depth.png",
   "mind_file": "target.mind",
   "layers": {
@@ -19,12 +19,12 @@
     }
   },
   "tracking": {
-    "precheckFeatureCount": 28,
-    "precheckGridOccupancy": 9,
-    "precheckDistributionScore": 0.562,
-    "compiledFeatureCount": 161,
-    "compiledGridOccupancy": 12,
-    "compiledDistributionScore": 0.75,
+    "precheckFeatureCount": null,
+    "precheckGridOccupancy": null,
+    "precheckDistributionScore": null,
+    "compiledFeatureCount": 1906,
+    "compiledGridOccupancy": 16,
+    "compiledDistributionScore": 1.0,
     "trackable": true
   },
   "animation": {
@@ -32,8 +32,9 @@
     "rig": null
   },
   "pipeline": {
-    "createdAt": "2026-07-01T09:49:09.780144+00:00",
+    "createdAt": "2026-07-01T12:00:00.000000+00:00",
     "depthModel": "small",
-    "segmentationMode": "auto"
+    "segmentationMode": "auto",
+    "note": "Replaced synthetic test image with feature-rich trackable poster"
   }
 }
