@@ -9,6 +9,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "compile-mind": "npm install --prefix pipeline && node pipeline/compile_mind.mjs",
+    "kiosk:setup": "python -m pip install -r requirements.txt",
     "kiosk:server": "python kiosk/server.py"
   },
   "devDependencies": {

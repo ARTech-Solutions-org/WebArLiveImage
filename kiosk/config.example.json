@@ -3,7 +3,7 @@
   "bundle_root": "../assets/targets",
   "output_root": "./output",
   "captures_root": "./captures",
-  "notes": "Booth display: {app_url}/kiosk?target=ID — Guest AR: {app_url}/?target=ID — Capture: {app_url}/kiosk/capture",
+  "notes": "app_url = Vercel URL for QR codes. cdn = required for guest targets on phones. Vercel env: VITE_BUNDLE_CDN_URL + VITE_PUBLIC_APP_URL.",
   "api": {
     "host": "127.0.0.1",
     "port": 8787,

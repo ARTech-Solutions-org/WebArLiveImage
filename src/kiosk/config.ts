@@ -1,4 +1,4 @@
-import { getArPageUrl, getTargetIdFromUrl, resolveAssetUrl, resolveBundleBaseUrl } from '../loader/config'
+import { getArPageUrl, getTargetIdFromUrl, resolveAssetUrl } from '../loader/config'
 
 const KIOSK_API_BASE = import.meta.env.VITE_KIOSK_API_URL?.replace(/\/$/, '')
 
@@ -18,13 +18,13 @@ export function getKioskTargetId(search = window.location.search): string | null
   return new URLSearchParams(search).get('target')
 }
 
-export function getKioskPageUrl(targetId: string, origin = window.location.origin): string {
-  return `${origin}/kiosk?target=${encodeURIComponent(targetId)}`
+export function getKioskPageUrl(targetId: string, origin?: string): string {
+  const base = origin ?? import.meta.env.VITE_PUBLIC_APP_URL?.replace(/\/$/, '') ?? window.location.origin
+  return `${base}/kiosk?target=${encodeURIComponent(targetId)}`
 }
 
-export function getBundleSourceUrl(targetId: string): string {
-  const base = resolveBundleBaseUrl(targetId)
-  return resolveAssetUrl(base, 'source.jpg')
+export function getBundleSourceUrl(_targetId: string, bundleBase: string): string {
+  return resolveAssetUrl(bundleBase, 'source.jpg')
 }
 
 export { getArPageUrl, getTargetIdFromUrl }

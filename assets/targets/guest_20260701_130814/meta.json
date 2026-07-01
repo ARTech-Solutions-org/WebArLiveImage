@@ -1,0 +1,39 @@
+{
+  "target_id": "guest_20260701_130814",
+  "version": 1,
+  "source": "source.jpg",
+  "width": 1280,
+  "height": 720,
+  "depth": "depth.png",
+  "mind_file": "target.mind",
+  "layers": {
+    "background": {
+      "displacementStrength": 0.15,
+      "mask": "mask_bg.png",
+      "zOffset": 0.0
+    },
+    "foreground": {
+      "displacementStrength": 0.45,
+      "mask": "mask_fg.png",
+      "zOffset": 0.02
+    }
+  },
+  "tracking": {
+    "precheckFeatureCount": 1444,
+    "precheckGridOccupancy": 16,
+    "precheckDistributionScore": 1.0,
+    "compiledFeatureCount": 3284,
+    "compiledGridOccupancy": 16,
+    "compiledDistributionScore": 1.0,
+    "trackable": true
+  },
+  "animation": {
+    "enabled": false,
+    "rig": null
+  },
+  "pipeline": {
+    "createdAt": "2026-07-01T13:08:46.180945+00:00",
+    "depthModel": "small",
+    "segmentationMode": "auto"
+  }
+}

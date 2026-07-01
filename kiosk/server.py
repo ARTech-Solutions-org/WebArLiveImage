@@ -6,8 +6,9 @@ The kiosk web page (deployed or local) POSTs to this service on the booth PC.
 ML processing stays local — not suitable for Vercel serverless.
 
 Usage:
+  # From repo root:
+  pip install -r requirements.txt
   python kiosk/server.py
-  python kiosk/server.py --config kiosk/config.json --port 8787
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
-from flask import Flask, jsonify, request
+from flask import Flask, abort, jsonify, request, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -153,8 +154,37 @@ def create_app(config_path: Path, config: dict, store: JobStore) -> Flask:
         # Local booth service on loopback — allow deployed kiosk origins from this PC's browser.
         CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+    bundle_root = resolve_path(config_path, config.get("bundle_root", "../assets/targets"), REPO_ROOT / "assets" / "targets")
     captures_root = resolve_path(config_path, config.get("captures_root", "./captures"), KIOSK_DIR / "captures")
     captures_root.mkdir(parents=True, exist_ok=True)
+
+    cdn_block = config.get("cdn") or {}
+    cdn_public = str(cdn_block.get("public_base_url", "")).rstrip("/")
+    cdn_prefix = str(cdn_block.get("prefix", "")).strip("/")
+    bundle_cdn_url = "/".join(part for part in (cdn_public, cdn_prefix) if part) or None
+
+    @app.get("/api/config")
+    def public_config():
+        app_url = str(config.get("app_url", "")).rstrip("/") or None
+        return jsonify(
+            {
+                "appUrl": app_url,
+                "bundleCdnUrl": bundle_cdn_url,
+                "hasCdn": bool(cdn_block),
+            }
+        )
+
+    @app.get("/api/bundles/<target_id>/<path:filename>")
+    def serve_bundle_file(target_id: str, filename: str):
+        bundle_dir = (bundle_root / target_id).resolve()
+        file_path = (bundle_dir / filename).resolve()
+
+        if not str(file_path).startswith(str(bundle_root.resolve())):
+            abort(404)
+        if not file_path.is_file():
+            abort(404)
+
+        return send_file(file_path)
 
     @app.get("/api/health")
     def health():
@@ -224,6 +254,15 @@ def main() -> int:
     port = args.port or int(api_cfg.get("port", 8787))
 
     app = create_app(config_path, config, store)
+    app_url = str(config.get("app_url", "")).rstrip("/")
+    if not app_url or "localhost" in app_url or "127.0.0.1" in app_url:
+        print("Warning: set app_url in kiosk/config.json to your Vercel URL so QR codes use the public link.", file=sys.stderr)
+    if not config.get("cdn"):
+        print(
+            "Warning: no cdn in kiosk/config.json — guest targets stay on this PC only. "
+            "Phones on the deployed AR app will not find guest bundles.",
+            file=sys.stderr,
+        )
     print(f"Kiosk API listening on http://{host}:{port}")
     print(f"Config: {config_path}")
     app.run(host=host, port=port, threaded=True)

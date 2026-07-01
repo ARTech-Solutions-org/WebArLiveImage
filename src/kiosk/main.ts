@@ -2,6 +2,7 @@ import QRCode from 'qrcode'
 import './style.css'
 import { getArPageUrl, getBundleSourceUrl, getKioskPageUrl, getKioskTargetId, isCaptureRoute } from './config'
 import { mountCaptureView } from './capture'
+import { loadKioskPublicConfig, resolveKioskBundleBase } from './runtime-config'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
@@ -53,19 +54,27 @@ function renderLanding(): void {
 function renderCapture(): void {
   renderShell('<div id="capture-root"></div>')
   const root = document.querySelector<HTMLDivElement>('#capture-root')!
-  captureCleanup = mountCaptureView(root, (targetId) => {
-    window.location.href = `/kiosk?target=${encodeURIComponent(targetId)}`
+  captureCleanup = mountCaptureView(root, (result) => {
+    window.location.href = result.kioskUrl
   })
 }
 
 async function renderTargetPreview(targetId: string): Promise<void> {
-  const sourceUrl = getBundleSourceUrl(targetId)
-  const arUrl = getArPageUrl(targetId)
-  const kioskUrl = getKioskPageUrl(targetId)
+  const publicConfig = await loadKioskPublicConfig()
+  const bundleBase = resolveKioskBundleBase(targetId, publicConfig)
+  const sourceUrl = getBundleSourceUrl(targetId, bundleBase)
+  const arUrl = getArPageUrl(targetId, publicConfig.appOrigin)
+  const kioskUrl = getKioskPageUrl(targetId, publicConfig.appOrigin)
+  const isGuest = targetId.startsWith('guest_')
+  const cdnWarning =
+    isGuest && !publicConfig.hasCdn
+      ? `<p class="error">Guest targets need CDN upload. Set <code>cdn</code> in <code>kiosk/config.json</code> and <code>VITE_BUNDLE_CDN_URL</code> on Vercel so phones can load the bundle.</p>`
+      : ''
 
   renderShell(`
     <section class="panel">
       <p class="muted">Target: <code>${targetId}</code></p>
+      ${cdnWarning}
       <div class="row" style="margin-bottom: 1rem;">
         <a class="button" href="${arUrl}" target="_blank" rel="noopener">Open AR experience</a>
         <a class="button secondary" href="/kiosk/capture">Take another photo</a>
@@ -105,7 +114,11 @@ async function renderTargetPreview(targetId: string): Promise<void> {
     status.textContent = 'Photo loaded. Ready for guest scan.'
   })
   image.addEventListener('error', () => {
-    status.innerHTML = `<span class="error">Could not load bundle at ${sourceUrl}. Run ingest/upload first.</span>`
+    status.innerHTML = `<span class="error">Could not load bundle at ${sourceUrl}. ${
+      isGuest
+        ? 'Ensure ingest finished and CDN upload succeeded (or booth API is running).'
+        : 'Run ingest/upload first.'
+    }</span>`
   })
   image.src = sourceUrl
 

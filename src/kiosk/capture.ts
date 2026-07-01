@@ -1,5 +1,6 @@
 import { startCameraFeed, stopCameraFeed } from '../ar-core/camera'
 import { checkKioskApiHealth, createPhotoJob, waitForJob } from './api'
+import type { CaptureCompleteResult } from './api'
 import { getKioskApiBaseUrl } from './config'
 
 const BOOTH_CAMERA: MediaStreamConstraints = {
@@ -13,7 +14,10 @@ const BOOTH_CAMERA: MediaStreamConstraints = {
 
 type CapturePhase = 'camera' | 'review' | 'processing'
 
-export function mountCaptureView(root: HTMLElement, onComplete: (targetId: string) => void): () => void {
+export function mountCaptureView(
+  root: HTMLElement,
+  onComplete: (result: CaptureCompleteResult) => void,
+): () => void {
   let stream: MediaStream | null = null
   let capturedBlob: Blob | null = null
   let phase: CapturePhase = 'camera'
@@ -172,7 +176,11 @@ export function mountCaptureView(root: HTMLElement, onComplete: (targetId: strin
       }
 
       setStatus('Done! Opening your preview…')
-      onComplete(finalStatus.targetId)
+      onComplete({
+        targetId: finalStatus.targetId,
+        kioskUrl: finalStatus.kioskUrl,
+        arUrl: finalStatus.arUrl,
+      })
     } catch (error) {
       phase = 'review'
       renderActions()

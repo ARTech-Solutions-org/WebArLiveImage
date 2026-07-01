@@ -1,5 +1,11 @@
 import { getKioskApiBaseUrl } from './config'
 
+export interface KioskServerConfig {
+  appUrl: string | null
+  bundleCdnUrl: string | null
+  hasCdn: boolean
+}
+
 export type JobState = 'queued' | 'processing' | 'complete' | 'failed'
 
 export interface CreateJobResponse {
@@ -14,9 +20,23 @@ export interface JobStatusResponse extends CreateJobResponse {
   error: string | null
 }
 
+export interface CaptureCompleteResult {
+  targetId: string
+  kioskUrl: string
+  arUrl: string
+}
+
 function apiUrl(path: string): string {
   const base = getKioskApiBaseUrl()
   return `${base}${path}`
+}
+
+export async function fetchKioskConfig(): Promise<KioskServerConfig> {
+  const response = await fetch(apiUrl('/api/config'))
+  if (!response.ok) {
+    throw new Error(`Config unavailable (${response.status})`)
+  }
+  return (await response.json()) as KioskServerConfig
 }
 
 export async function checkKioskApiHealth(): Promise<boolean> {

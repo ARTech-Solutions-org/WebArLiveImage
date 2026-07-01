@@ -110,9 +110,12 @@ async function boot(): Promise<void> {
     if (token !== bootToken) return
 
     if (error instanceof TargetBundleError) {
+      const isGuest = error.targetId?.startsWith('guest_')
       const hint =
         error.status === 404
-          ? `Target "${error.targetId}" not found.`
+          ? isGuest
+            ? `Target "${error.targetId}" not found. Guest bundles must be uploaded to CDN — set VITE_BUNDLE_CDN_URL on Vercel and configure cdn in kiosk/config.json.`
+            : `Target "${error.targetId}" not found.`
           : error.message
       setStatus('error', hint)
       return
