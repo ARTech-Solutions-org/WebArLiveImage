@@ -10,6 +10,10 @@ export interface KioskPublicConfig {
 
 let cached: KioskPublicConfig | null = null
 
+export function resetKioskPublicConfigCache(): void {
+  cached = null
+}
+
 export async function loadKioskPublicConfig(): Promise<KioskPublicConfig> {
   if (cached) return cached
 

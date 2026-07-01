@@ -1,5 +1,5 @@
 import { startCameraFeed, stopCameraFeed } from '../ar-core/camera'
-import { checkKioskApiHealth, createPhotoJob, waitForJob } from './api'
+import { checkKioskApiHealth, createPhotoJob, waitForJob, waitForLocalBundle } from './api'
 import type { CaptureCompleteResult } from './api'
 import { getKioskApiBaseUrl } from './config'
 
@@ -174,6 +174,9 @@ export function mountCaptureView(
       if (finalStatus.status === 'failed') {
         throw new Error(finalStatus.error || 'Processing failed.')
       }
+
+      setStatus('Verifying bundle…')
+      await waitForLocalBundle(finalStatus.targetId)
 
       setStatus('Done! Opening your preview…')
       onComplete({

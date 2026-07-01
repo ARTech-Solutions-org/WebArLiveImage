@@ -78,6 +78,43 @@ export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
 
 const POLL_MS = 1500
 
+export async function waitForLocalBundle(targetId: string): Promise<void> {
+  const apiBase = getKioskApiBaseUrl()
+  const url = apiBase
+    ? `${apiBase}/api/bundles/${encodeURIComponent(targetId)}/source.jpg`
+    : `/api/bundles/${encodeURIComponent(targetId)}/source.jpg`
+
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    try {
+      const response = await fetch(url, { method: 'HEAD' })
+      if (response.ok) return
+    } catch {
+      // retry
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 1500))
+  }
+
+  throw new Error(
+    `Bundle ${targetId} was not created. Check the kiosk server terminal for ingest/upload errors.`,
+  )
+}
+
+export async function waitForBundleOnCdn(targetId: string, bundleCdnUrl: string): Promise<void> {
+  const url = `${bundleCdnUrl.replace(/\/$/, '')}/${encodeURIComponent(targetId)}/source.jpg`
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    try {
+      const response = await fetch(url, { method: 'HEAD' })
+      if (response.ok) return
+    } catch {
+      // retry
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 1500))
+  }
+  throw new Error(
+    `Bundle ${targetId} is not on CDN yet. Check the kiosk server terminal for upload errors, then retry.`,
+  )
+}
+
 export async function waitForJob(
   jobId: string,
   onUpdate?: (status: JobStatusResponse) => void,

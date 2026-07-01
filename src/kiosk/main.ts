@@ -2,7 +2,7 @@ import QRCode from 'qrcode'
 import './style.css'
 import { getArPageUrl, getBundleSourceUrl, getKioskPageUrl, getKioskTargetId, isCaptureRoute } from './config'
 import { mountCaptureView } from './capture'
-import { loadKioskPublicConfig, resolveKioskBundleBase } from './runtime-config'
+import { loadKioskPublicConfig, resetKioskPublicConfigCache, resolveKioskBundleBase } from './runtime-config'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
@@ -55,11 +55,12 @@ function renderCapture(): void {
   renderShell('<div id="capture-root"></div>')
   const root = document.querySelector<HTMLDivElement>('#capture-root')!
   captureCleanup = mountCaptureView(root, (result) => {
-    window.location.href = result.kioskUrl
+    window.location.href = `/kiosk?target=${encodeURIComponent(result.targetId)}`
   })
 }
 
 async function renderTargetPreview(targetId: string): Promise<void> {
+  resetKioskPublicConfigCache()
   const publicConfig = await loadKioskPublicConfig()
   const bundleBase = resolveKioskBundleBase(targetId, publicConfig)
   const sourceUrl = getBundleSourceUrl(targetId, bundleBase)

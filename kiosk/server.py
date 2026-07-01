@@ -113,6 +113,7 @@ def run_job_worker(
     store: JobStore,
 ) -> None:
     store.update(job_id, status="processing")
+    config = load_config(config_path)
 
     cmd = [
         sys.executable,
@@ -124,6 +125,7 @@ def run_job_worker(
         "--config",
         str(config_path),
         "--no-open",
+        "--skip-preview",
     ]
     if not config.get("cdn"):
         cmd.append("--skip-upload")

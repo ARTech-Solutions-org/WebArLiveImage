@@ -32,6 +32,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-upload", action="store_true", help="Skip CDN upload")
     parser.add_argument("--skip-ingest", action="store_true", help="Skip ingest (bundle must already exist)")
     parser.add_argument("--no-open", action="store_true", help="Do not open browser preview")
+    parser.add_argument("--skip-preview", action="store_true", help="Skip preview sheet (API jobs)")
     parser.add_argument("--segmentation", choices=["auto", "selfie", "rembg"], default="auto")
     return parser.parse_args()
 
@@ -111,7 +112,15 @@ def main() -> int:
         ]
         code = run_step(upload_cmd, PIPELINE_DIR)
         if code != 0:
-            print("Warning: upload failed; local preview will still use app_url + target id.", file=sys.stderr)
+            print("Error: CDN upload failed. Phones will not find this guest target.", file=sys.stderr)
+            return code
+
+    if args.skip_preview:
+        print("\nKiosk job complete (ingest + upload).")
+        print(f"Booth screen: {app_url}/kiosk?target={target_id}")
+        print(f"Guest AR link: {app_url}/?target={target_id}")
+        print(f"Local bundle path: {bundle_dir}")
+        return 0
 
     preview_cmd = [
         sys.executable,
